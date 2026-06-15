@@ -38,6 +38,15 @@ const userSchema = new mongoose.Schema(
     dateOfBirth: { type: Date },
     address: { type: String, trim: true },
     profileImage: { type: String, default: '' },
+    currentPlan: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'MembershipPlan',
+      default: null,
+    },
+    planExpiresAt: {
+      type: Date,
+      default: null,
+    },
     refreshToken: { type: String, default: null },
   },
   { timestamps: true }
