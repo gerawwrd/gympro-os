@@ -6,11 +6,51 @@ import MembershipPlan from '../models/MembershipPlan.js';
 dotenv.config();
 
 const plans = [
-  { name: 'Daily Pass', price: 50, durationDays: 1 },
-  { name: 'Weekly Pass', price: 250, durationDays: 7 },
-  { name: 'Monthly Pass', price: 500, durationDays: 30 },
-  { name: 'Quarterly Pass', price: 1200, durationDays: 90 },
-  { name: 'Annual Pass', price: 5000, durationDays: 365 },
+  {
+    name: 'Daily Pass',
+    price: 50,
+    durationDays: 1,
+    perks: [
+      'Single entry access badge',
+      'Locker room use',
+      'Access to cardiovascular machine tracks',
+      'Gym general area access',
+    ],
+  },
+  {
+    name: 'Weekly Pass',
+    price: 250,
+    durationDays: 7,
+    perks: [
+      '7 consecutive scan passes',
+      'Standard locker allocation',
+      'Full machine area integration',
+      'Shower room towels basic use',
+    ],
+  },
+  {
+    name: 'Monthly Pass',
+    price: 500,
+    durationDays: 30,
+    perks: [
+      '30-day scans allocation',
+      'Full access anytime of day',
+      'Free hydration water bottle access',
+      'Group fitness trial voucher',
+    ],
+  },
+  {
+    name: 'Quarterly Pass',
+    price: 1200,
+    durationDays: 90,
+    perks: ['90-day subscription value', 'Full access anytime of day'],
+  },
+  {
+    name: 'Annual Pass',
+    price: 5000,
+    durationDays: 365,
+    perks: ['365-day access index', 'Free guest ticket monthly'],
+  },
 ];
 
 const seed = async () => {

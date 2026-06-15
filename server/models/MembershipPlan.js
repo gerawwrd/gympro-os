@@ -6,6 +6,7 @@ const membershipPlanSchema = new mongoose.Schema(
       type: String,
       required: true,
       trim: true,
+      unique: true,
     },
     price: {
       type: Number,
@@ -16,6 +17,14 @@ const membershipPlanSchema = new mongoose.Schema(
       type: Number,
       required: true,
       min: 1,
+    },
+    perks: {
+      type: [String],
+      default: [],
+    },
+    isActive: {
+      type: Boolean,
+      default: true,
     },
   },
   { timestamps: true }
