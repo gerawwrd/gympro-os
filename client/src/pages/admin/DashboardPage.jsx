@@ -1,18 +1,15 @@
-import { useAuth } from '../../context/AuthContext';
+import { AdminLayout } from '../../components/layout/AdminLayout';
 
 export const DashboardPage = () => {
-  const { user, logout } = useAuth();
-
   return (
-    <div className="p-8">
-      <h1 className="text-2xl font-bold">Admin Dashboard</h1>
-      <p className="mt-2 text-gray-600">Welcome, {user?.name}</p>
-      <button
-        onClick={logout}
-        className="mt-4 rounded-lg bg-gray-900 px-4 py-2 text-sm font-semibold text-white"
-      >
-        Sign Out
-      </button>
-    </div>
+    <AdminLayout moduleName="Dashboard">
+      <h1 className="text-2xl font-bold text-gray-900">System Deck Control</h1>
+      <p className="text-gray-500 text-sm mt-1">
+        GymPro overall facility analytics, attendance thresholds and billing checks.
+      </p>
+      <div className="mt-6 text-gray-400">
+        Dashboard content coming soon...
+      </div>
+    </AdminLayout>
   );
 };
