@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { AdminLayout } from '../../components/layout/AdminLayout';
 import api from '../../api/axios';
+import { RegisterMemberModal } from '../../components/ui/RegisterMemberModal';
 
 export const MembersPage = () => {
   const [members, setMembers] = useState([]);
@@ -8,6 +9,7 @@ export const MembersPage = () => {
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState('all');
   const [error, setError] = useState('');
+  const [showRegisterModal, setShowRegisterModal] = useState(false);
 
   const fetchMembers = async (searchTerm = '', statusFilter = '') => {
     try {
@@ -17,7 +19,7 @@ export const MembersPage = () => {
       if (statusFilter && statusFilter !== 'all') params.append('status', statusFilter);
       const res = await api.get(`/members?${params.toString()}`);
       setMembers(res.data.members);
-    } catch (err) {
+    } catch {
       setError('Failed to load members');
     } finally {
       setLoading(false);
@@ -25,8 +27,11 @@ export const MembersPage = () => {
   };
 
   useEffect(() => {
-    fetchMembers();
-  }, []);
+  const load = async () => {
+    await fetchMembers();
+  };
+  load();
+}, []);
 
   const handleSearch = (e) => {
     const val = e.target.value;
@@ -63,7 +68,7 @@ export const MembersPage = () => {
           </p>
         </div>
         <button
-          onClick={() => alert('Register modal coming next!')}
+          onClick={() => setShowRegisterModal(true)}
           className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-blue-700 transition-colors"
         >
           + Register New Athlete
@@ -204,6 +209,13 @@ export const MembersPage = () => {
           ))
         )}
       </div>
+
+      {showRegisterModal && (
+  <RegisterMemberModal
+    onClose={() => setShowRegisterModal(false)}
+    onSuccess={() => fetchMembers(search, filter)}
+  />
+)}
     </AdminLayout>
   );
 };
