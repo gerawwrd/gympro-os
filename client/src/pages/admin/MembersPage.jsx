@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { AdminLayout } from '../../components/layout/AdminLayout';
 import api from '../../api/axios';
 import { RegisterMemberModal } from '../../components/ui/RegisterMemberModal';
+import { EditMemberModal } from '../../components/ui/EditMemberModal';
 
 export const MembersPage = () => {
   const [members, setMembers] = useState([]);
@@ -10,6 +11,7 @@ export const MembersPage = () => {
   const [filter, setFilter] = useState('all');
   const [error, setError] = useState('');
   const [showRegisterModal, setShowRegisterModal] = useState(false);
+  const [editingMember, setEditingMember] = useState(null);
 
   const fetchMembers = async (searchTerm = '', statusFilter = '') => {
     try {
@@ -191,7 +193,7 @@ export const MembersPage = () => {
                   👁
                 </button>
                 <button
-                  onClick={() => alert(`Edit ${member.name}`)}
+                  onClick={() => setEditingMember(member)}
                   className="text-gray-400 hover:text-gray-600 transition-colors"
                   title="Edit"
                 >
@@ -210,9 +212,16 @@ export const MembersPage = () => {
         )}
       </div>
 
-      {showRegisterModal && (
+    {showRegisterModal && (
   <RegisterMemberModal
     onClose={() => setShowRegisterModal(false)}
+    onSuccess={() => fetchMembers(search, filter)}
+  />
+)}
+    {editingMember && (
+  <EditMemberModal
+    member={editingMember}
+    onClose={() => setEditingMember(null)}
     onSuccess={() => fetchMembers(search, filter)}
   />
 )}
