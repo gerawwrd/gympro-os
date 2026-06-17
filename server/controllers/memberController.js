@@ -1,5 +1,7 @@
 import User from '../models/User.js';
 import MembershipPlan from '../models/MembershipPlan.js';
+import Payment from '../models/Payment.js';
+import Counter from '../models/Counter.js';
 import { getNextMemberCode } from '../utils/generateMemberCode.js';
 
 // @desc    Get all members (with search & status filter)
@@ -73,6 +75,7 @@ export const createMember = async (req, res) => {
       planId,
       password,
       address,
+      paymentMethod,
     } = req.body;
 
     if (!firstName || !lastName || !email) {
@@ -84,20 +87,20 @@ export const createMember = async (req, res) => {
       return res.status(409).json({ message: 'Email already registered' });
     }
 
-    // Validate plan BEFORE generating the member code
+    // Validate plan BEFORE generating member code
     let currentPlan = null;
     let planExpiresAt = null;
+    let planDoc = null;
 
     if (planId) {
-      const plan = await MembershipPlan.findById(planId);
-      if (!plan) {
+      planDoc = await MembershipPlan.findById(planId);
+      if (!planDoc) {
         return res.status(400).json({ message: 'Invalid membership plan selected' });
       }
-      currentPlan = plan._id;
-      planExpiresAt = new Date(Date.now() + plan.durationDays * 24 * 60 * 60 * 1000);
+      currentPlan = planDoc._id;
+      planExpiresAt = new Date(Date.now() + planDoc.durationDays * 24 * 60 * 60 * 1000);
     }
 
-    // Only generate the code once we know the request is valid
     const memberCode = await getNextMemberCode();
 
     const member = await User.create({
@@ -114,6 +117,25 @@ export const createMember = async (req, res) => {
       currentPlan,
       planExpiresAt,
     });
+
+    // Record initial payment if plan was selected
+    if (planId && planDoc) {
+      const counter = await Counter.findByIdAndUpdate(
+        { _id: 'paymentRef' },
+        { $inc: { seq: 1 } },
+        { new: true, upsert: true }
+      );
+      await Payment.create({
+        referenceId: `TXN${counter.seq}`,
+        member: member._id,
+        memberCode: member.memberCode,
+        memberName: member.name,
+        plan: planDoc._id,
+        planName: planDoc.name,
+        planPrice: planDoc.price,
+        paymentMethod: paymentMethod || 'Cash',
+      });
+    }
 
     const populatedMember = await User.findById(member._id)
       .populate('currentPlan', 'name price durationDays')

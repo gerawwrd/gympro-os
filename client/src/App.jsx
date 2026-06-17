@@ -6,6 +6,7 @@ import { DashboardPage } from './pages/admin/DashboardPage';
 import { MembersPage } from './pages/admin/MembersPage';
 import { PlansPage } from './pages/admin/PlansPage';
 import { AttendancePage } from './pages/admin/AttendancePage';
+import { PaymentsPage } from './pages/admin/PaymentsPage';
 import { MemberDashboardPage } from './pages/member/MemberDashboardPage';
 import { MemberQRPage } from './pages/member/MemberQRPage';
 
@@ -27,6 +28,9 @@ function App() {
           } />
           <Route path="/admin/attendance" element={
             <ProtectedRoute allowedRoles={['admin']}><AttendancePage /></ProtectedRoute>
+          } />
+          <Route path="/admin/payments" element={
+            <ProtectedRoute allowedRoles={['admin']}><PaymentsPage /></ProtectedRoute>
           } />
 
           <Route path="/member/dashboard" element={
