@@ -7,20 +7,27 @@ export const getDashboardStats = async (req, res) => {
   try {
     const now = new Date();
 
-    const allMembers = await User.find({ role: 'member' });
-    const totalMembers = allMembers.length;
+    // Total members
+    // Get all members first
+const allMembers = await User.find({ role: 'member' });
+const totalMembers = allMembers.length;
+const now = new Date();
 
-    const activeCycles = allMembers.filter(
-      (m) => m.currentPlan && m.planExpiresAt && m.planExpiresAt > now
-    ).length;
+// Compute active/expired the same way as MembersPage
+const activeCycles = allMembers.filter(
+  (m) => m.currentPlan && m.planExpiresAt && m.planExpiresAt > now
+).length;
 
-    const expiredPlans = allMembers.filter(
-      (m) => !m.currentPlan || !m.planExpiresAt || m.planExpiresAt <= now
-    ).length;
-
+const expiredPlans = allMembers.filter(
+  (m) => !m.currentPlan || !m.planExpiresAt || m.planExpiresAt <= now
+).length;
+    // Today's check-ins (placeholder until Attendance module is built)
     const todayCheckIns = 0;
+
+    // Currently working out (placeholder)
     const currentlyWorkingOut = 0;
 
+    // Revenue plan mix — count active holders per plan
     const plans = await MembershipPlan.find({ isActive: true });
     const revenuePlanMix = await Promise.all(
       plans.map(async (plan) => {
@@ -38,8 +45,10 @@ export const getDashboardStats = async (req, res) => {
       })
     );
 
+    // Gross income (sum of all plan revenues)
     const grossIncome = revenuePlanMix.reduce((sum, p) => sum + p.revenue, 0);
 
+    // Weekly attendance (placeholder until Attendance module)
     const weeklyAttendance = [
       { day: 'Mon', count: 0 },
       { day: 'Tue', count: 0 },

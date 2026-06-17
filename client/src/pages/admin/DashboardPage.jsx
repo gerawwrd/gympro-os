@@ -3,7 +3,7 @@ import { AdminLayout } from '../../components/layout/AdminLayout';
 import api from '../../api/axios';
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
-  PieChart, Pie, Cell, Legend,
+  PieChart, Pie, Cell,
 } from 'recharts';
 
 const StatCard = ({ icon, label, value, valueColor = 'text-gray-900', bgColor = 'bg-blue-50' }) => (

@@ -84,8 +84,7 @@ export const createMember = async (req, res) => {
       return res.status(409).json({ message: 'Email already registered' });
     }
 
-    const memberCode = await getNextMemberCode();
-
+    // Validate plan BEFORE generating the member code
     let currentPlan = null;
     let planExpiresAt = null;
 
@@ -97,6 +96,9 @@ export const createMember = async (req, res) => {
       currentPlan = plan._id;
       planExpiresAt = new Date(Date.now() + plan.durationDays * 24 * 60 * 60 * 1000);
     }
+
+    // Only generate the code once we know the request is valid
+    const memberCode = await getNextMemberCode();
 
     const member = await User.create({
       name: `${firstName} ${lastName}`,
