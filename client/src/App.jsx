@@ -5,7 +5,9 @@ import { LoginPage } from './pages/auth/LoginPage';
 import { DashboardPage } from './pages/admin/DashboardPage';
 import { MembersPage } from './pages/admin/MembersPage';
 import { PlansPage } from './pages/admin/PlansPage';
+import { AttendancePage } from './pages/admin/AttendancePage';
 import { MemberDashboardPage } from './pages/member/MemberDashboardPage';
+import { MemberQRPage } from './pages/member/MemberQRPage';
 
 function App() {
   return (
@@ -23,9 +25,15 @@ function App() {
           <Route path="/admin/plans" element={
             <ProtectedRoute allowedRoles={['admin']}><PlansPage /></ProtectedRoute>
           } />
+          <Route path="/admin/attendance" element={
+            <ProtectedRoute allowedRoles={['admin']}><AttendancePage /></ProtectedRoute>
+          } />
 
           <Route path="/member/dashboard" element={
             <ProtectedRoute allowedRoles={['member']}><MemberDashboardPage /></ProtectedRoute>
+          } />
+          <Route path="/member/qr" element={
+            <ProtectedRoute allowedRoles={['member']}><MemberQRPage /></ProtectedRoute>
           } />
 
           <Route path="/" element={<Navigate to="/login" replace />} />
