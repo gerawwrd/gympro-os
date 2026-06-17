@@ -8,6 +8,7 @@ import { PlansPage } from './pages/admin/PlansPage';
 import { AttendancePage } from './pages/admin/AttendancePage';
 import { PaymentsPage } from './pages/admin/PaymentsPage';
 import { ReportsPage } from './pages/admin/ReportsPage';
+import { SettingsPage } from './pages/admin/SettingsPage';
 import { MemberDashboardPage } from './pages/member/MemberDashboardPage';
 import { MemberQRPage } from './pages/member/MemberQRPage';
 
@@ -35,6 +36,9 @@ function App() {
           } />
           <Route path="/admin/reports" element={
             <ProtectedRoute allowedRoles={['admin']}><ReportsPage /></ProtectedRoute>
+          } />
+          <Route path="/admin/settings" element={
+            <ProtectedRoute allowedRoles={['admin']}><SettingsPage /></ProtectedRoute>
           } />
 
           <Route path="/member/dashboard" element={
