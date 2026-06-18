@@ -6,12 +6,8 @@ import { DashboardPage } from './pages/admin/DashboardPage';
 import { MembersPage } from './pages/admin/MembersPage';
 import { PlansPage } from './pages/admin/PlansPage';
 import { AttendancePage } from './pages/admin/AttendancePage';
-import { PaymentsPage } from './pages/admin/PaymentsPage';
-import { ReportsPage } from './pages/admin/ReportsPage';
-import { SettingsPage } from './pages/admin/SettingsPage';
 import { MemberDashboardPage } from './pages/member/MemberDashboardPage';
 import { MemberQRPage } from './pages/member/MemberQRPage';
-import { MemberProfilePage } from './pages/member/MemberProfilePage';
 
 function App() {
   return (
@@ -32,24 +28,12 @@ function App() {
           <Route path="/admin/attendance" element={
             <ProtectedRoute allowedRoles={['admin']}><AttendancePage /></ProtectedRoute>
           } />
-          <Route path="/admin/payments" element={
-            <ProtectedRoute allowedRoles={['admin']}><PaymentsPage /></ProtectedRoute>
-          } />
-          <Route path="/admin/reports" element={
-            <ProtectedRoute allowedRoles={['admin']}><ReportsPage /></ProtectedRoute>
-          } />
-          <Route path="/admin/settings" element={
-            <ProtectedRoute allowedRoles={['admin']}><SettingsPage /></ProtectedRoute>
-          } />
 
           <Route path="/member/dashboard" element={
             <ProtectedRoute allowedRoles={['member']}><MemberDashboardPage /></ProtectedRoute>
           } />
           <Route path="/member/qr" element={
             <ProtectedRoute allowedRoles={['member']}><MemberQRPage /></ProtectedRoute>
-          } />
-          <Route path="/member/profile" element={
-            <ProtectedRoute allowedRoles={['member']}><MemberProfilePage /></ProtectedRoute>
           } />
 
           <Route path="/" element={<Navigate to="/login" replace />} />
