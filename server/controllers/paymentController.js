@@ -105,3 +105,17 @@ export const recordPayment = async (req, res) => {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
+
+// @desc    Get payments for the logged-in member
+// @route   GET /api/payments/my
+export const getMyPayments = async (req, res) => {
+  try {
+    const payments = await Payment.find({ member: req.user.id })
+      .sort({ paidAt: -1 })
+      .populate('plan', 'name price durationDays');
+
+    res.status(200).json({ count: payments.length, payments });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};

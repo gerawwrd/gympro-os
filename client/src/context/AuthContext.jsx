@@ -20,7 +20,10 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const initAuth = async () => {
       try {
-        const refreshRes = await api.post('/auth/refresh');
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 5000);
+        const refreshRes = await api.post('/auth/refresh', {}, { signal: controller.signal });
+        clearTimeout(timeout);
         accessTokenRef.current = refreshRes.data.accessToken;
         const meRes = await api.get('/auth/me');
         setUser(meRes.data.user);

@@ -5,7 +5,6 @@ const api = axios.create({
   withCredentials: true,
 });
 
-// This will be set by AuthContext so the interceptor can access the current token
 let getAccessToken = () => null;
 let onTokenRefreshed = () => {};
 
@@ -14,7 +13,6 @@ export const setAuthHandlers = (getTokenFn, onRefreshFn) => {
   onTokenRefreshed = onRefreshFn;
 };
 
-// Attach access token to every outgoing request
 api.interceptors.request.use((config) => {
   const token = getAccessToken();
   if (token) {
@@ -23,11 +21,15 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// If a request fails with 401, try refreshing the token once, then retry
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
+
+    // Never retry refresh calls — prevents infinite loop
+    if (originalRequest.url?.includes('/auth/refresh')) {
+      return Promise.reject(error);
+    }
 
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;

@@ -11,6 +11,7 @@ import { ReportsPage } from './pages/admin/ReportsPage';
 import { SettingsPage } from './pages/admin/SettingsPage';
 import { MemberDashboardPage } from './pages/member/MemberDashboardPage';
 import { MemberQRPage } from './pages/member/MemberQRPage';
+import { MemberProfilePage } from './pages/member/MemberProfilePage';
 
 function App() {
   return (
@@ -46,6 +47,9 @@ function App() {
           } />
           <Route path="/member/qr" element={
             <ProtectedRoute allowedRoles={['member']}><MemberQRPage /></ProtectedRoute>
+          } />
+          <Route path="/member/profile" element={
+            <ProtectedRoute allowedRoles={['member']}><MemberProfilePage /></ProtectedRoute>
           } />
 
           <Route path="/" element={<Navigate to="/login" replace />} />
