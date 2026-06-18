@@ -1,7 +1,7 @@
+import Counter from '../models/Counter.js';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import MembershipPlan from '../models/MembershipPlan.js';
-import Counter from '../models/Counter.js';
 
 dotenv.config();
 
@@ -65,20 +65,21 @@ const seed = async () => {
     console.log('Seeded membership plans');
 
     const existingCounter = await Counter.findById('memberCode');
-    if (!existingCounter) {
-      await Counter.create({ _id: 'memberCode', seq: 1000 });
-      console.log('Initialized memberCode counter at 1000');
-    } else {
-      console.log(`memberCode counter already exists at ${existingCounter.seq}, skipping reset`);
-    }
+if (!existingCounter) {
+  await Counter.create({ _id: 'memberCode', seq: 1000 });
+  console.log('Initialized memberCode counter at 1000');
+} else {
+  console.log(`memberCode counter already exists at ${existingCounter.seq}, skipping reset`);
+}
 
-    const existingPaymentCounter = await Counter.findById('paymentRef');
-    if (!existingPaymentCounter) {
-      await Counter.create({ _id: 'paymentRef', seq: 10000000 });
-      console.log('Initialized paymentRef counter at 10000000');
-    } else {
-      console.log(`paymentRef counter already exists at ${existingPaymentCounter.seq}, skipping reset`);
-    }
+    await Counter.findByIdAndUpdate(
+  { _id: 'paymentRef' },
+  { $set: { seq: 10000000 } },
+  { upsert: true }
+);
+console.log('Initialized paymentRef counter at 10000000');
+
+    console.log('Initialized memberCode counter at 1000');
 
     process.exit(0);
   } catch (error) {

@@ -4,7 +4,7 @@ import { MemberLayout } from '../../components/layout/MemberLayout';
 import api from '../../api/axios';
 
 export const MemberProfilePage = () => {
-  const { user } = useAuth();
+  const { user, refreshUser } = useAuth();
   const [activeTab, setActiveTab] = useState('profile');
   const [profileForm, setProfileForm] = useState({
     phone: user?.phone || '',
@@ -44,6 +44,7 @@ export const MemberProfilePage = () => {
   const handleProfileSave = async () => {
     try {
       setProfileLoading(true);
+      await refreshUser();
       await api.put('/auth/profile', profileForm);
       showFeedback(setProfileFeedback, 'success', 'Profile updated successfully');
     } catch (err) {

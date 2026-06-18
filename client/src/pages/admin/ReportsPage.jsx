@@ -32,8 +32,8 @@ export const ReportsPage = () => {
 
   const exportCSV = () => {
     if (!data) return;
-    let rows = [];
-    let filename = '';
+    let rows;
+    let filename;
 
     if (activeTab === 0) {
       filename = 'attendance_report.csv';
@@ -51,7 +51,7 @@ export const ReportsPage = () => {
         Member: p.memberName,
         Code: p.memberCode,
         Plan: p.planName,
-        Amount: `P${p.planPrice}`,
+        Amount: `₱${p.planPrice}`,
         Method: p.paymentMethod,
         Date: new Date(p.paidAt).toLocaleString(),
       }));
@@ -78,90 +78,94 @@ export const ReportsPage = () => {
   };
 
   const exportPDF = () => {
-    if (!data) return;
-    const doc = new jsPDF();
-    const now = new Date().toLocaleString();
+  if (!data) return;
+  const doc = new jsPDF();
+  const now = new Date().toLocaleString();
 
-    doc.setFontSize(16);
-    doc.setTextColor(37, 99, 235);
-    doc.text('GymPro Elite Fit', 14, 15);
+  // Header
+  doc.setFontSize(16);
+  doc.setTextColor(37, 99, 235);
+  doc.text('GymPro Elite Fit', 14, 15);
+  doc.setFontSize(10);
+  doc.setTextColor(100);
+  doc.text(`Report generated: ${now}`, 14, 22);
+
+  if (activeTab === 0) {
+    doc.setFontSize(13);
+    doc.setTextColor(30);
+    doc.text('Attendance Sheets Report', 14, 32);
     doc.setFontSize(10);
     doc.setTextColor(100);
-    doc.text(`Report generated: ${now}`, 14, 22);
+    doc.text(`Total Visits: ${data.attendance.totalVisits} | Avg Duration: ${data.attendance.avgDuration} mins`, 14, 39);
 
-    if (activeTab === 0) {
-      doc.setFontSize(13);
-      doc.setTextColor(30);
-      doc.text('Attendance Sheets Report', 14, 32);
-      doc.setFontSize(10);
-      doc.setTextColor(100);
-      doc.text(`Total Visits: ${data.attendance.totalVisits} | Avg Duration: ${data.attendance.avgDuration} mins`, 14, 39);
-      autoTable(doc, {
-        startY: 45,
-        head: [['Athlete', 'Code', 'Check-In', 'Check-Out', 'Duration']],
-        body: data.attendance.recentSessions.map((s) => [
-          s.member?.name || '-',
-          s.memberCode,
-          new Date(s.checkInTime).toLocaleString(),
-          s.checkOutTime ? new Date(s.checkOutTime).toLocaleString() : 'Active',
-          s.duration ? `${s.duration} mins` : '-',
-        ]),
-        styles: { fontSize: 9 },
-        headStyles: { fillColor: [37, 99, 235] },
-      });
-      doc.save('attendance_report.pdf');
+    autoTable(doc, {
+      startY: 45,
+      head: [['Athlete', 'Code', 'Check-In', 'Check-Out', 'Duration']],
+      body: data.attendance.recentSessions.map((s) => [
+        s.member?.name || '—',
+        s.memberCode,
+        new Date(s.checkInTime).toLocaleString(),
+        s.checkOutTime ? new Date(s.checkOutTime).toLocaleString() : 'Active',
+        s.duration ? `${s.duration} mins` : '—',
+      ]),
+      styles: { fontSize: 9 },
+      headStyles: { fillColor: [37, 99, 235] },
+    });
+    doc.save('attendance_report.pdf');
 
-    } else if (activeTab === 1) {
-      doc.setFontSize(13);
-      doc.setTextColor(30);
-      doc.text('Revenue Audits Report', 14, 32);
-      doc.setFontSize(10);
-      doc.setTextColor(100);
-      doc.text(`Total Revenue: P${data.revenue.totalRevenue.toLocaleString()} | Invoices: ${data.revenue.totalInvoices}`, 14, 39);
-      autoTable(doc, {
-        startY: 45,
-        head: [['Reference', 'Member', 'Code', 'Plan', 'Method', 'Amount', 'Date']],
-        body: data.revenue.payments.map((p) => [
-          p.referenceId,
-          p.memberName,
-          p.memberCode,
-          p.planName,
-          p.paymentMethod,
-          `P${p.planPrice}`,
-          new Date(p.paidAt).toLocaleDateString(),
-        ]),
-        styles: { fontSize: 9 },
-        headStyles: { fillColor: [37, 99, 235] },
-      });
-      doc.save('revenue_report.pdf');
+  } else if (activeTab === 1) {
+    doc.setFontSize(13);
+    doc.setTextColor(30);
+    doc.text('Revenue Audits Report', 14, 32);
+    doc.setFontSize(10);
+    doc.setTextColor(100);
+    doc.text(`Total Revenue: ₱${data.revenue.totalRevenue.toLocaleString()} | Invoices: ${data.revenue.totalInvoices}`, 14, 39);
 
-    } else {
-      doc.setFontSize(13);
-      doc.setTextColor(30);
-      doc.text('Membership Registers Report', 14, 32);
-      doc.setFontSize(10);
-      doc.setTextColor(100);
-      doc.text(`Total: ${data.membership.totalMembers} | Active: ${data.membership.activeMembers} | Expired: ${data.membership.expiredMembers}`, 14, 39);
-      autoTable(doc, {
-        startY: 45,
-        head: [['Code', 'Name', 'Email', 'Plan', 'Expiration', 'Status']],
-        body: data.membership.membersChecklist.map((m) => {
-          const isActive = m.currentPlan && m.planExpiresAt && new Date(m.planExpiresAt) > new Date();
-          return [
-            m.memberCode,
-            m.name,
-            m.email,
-            m.currentPlan?.name || 'None',
-            m.planExpiresAt ? new Date(m.planExpiresAt).toLocaleDateString() : 'N/A',
-            isActive ? 'ACTIVE' : 'EXPIRED',
-          ];
-        }),
-        styles: { fontSize: 9 },
-        headStyles: { fillColor: [37, 99, 235] },
-      });
-      doc.save('membership_report.pdf');
-    }
-  };
+    autoTable(doc, {
+      startY: 45,
+      head: [['Reference', 'Member', 'Code', 'Plan', 'Method', 'Amount', 'Date']],
+      body: data.revenue.payments.map((p) => [
+        p.referenceId,
+        p.memberName,
+        p.memberCode,
+        p.planName,
+        p.paymentMethod,
+        `₱${p.planPrice}`,
+        new Date(p.paidAt).toLocaleDateString(),
+      ]),
+      styles: { fontSize: 9 },
+      headStyles: { fillColor: [37, 99, 235] },
+    });
+    doc.save('revenue_report.pdf');
+
+  } else {
+    doc.setFontSize(13);
+    doc.setTextColor(30);
+    doc.text('Membership Registers Report', 14, 32);
+    doc.setFontSize(10);
+    doc.setTextColor(100);
+    doc.text(`Total: ${data.membership.totalMembers} | Active: ${data.membership.activeMembers} | Expired: ${data.membership.expiredMembers}`, 14, 39);
+
+    autoTable(doc, {
+      startY: 45,
+      head: [['Code', 'Name', 'Email', 'Plan', 'Expiration', 'Status']],
+      body: data.membership.membersChecklist.map((m) => {
+        const isActive = m.currentPlan && m.planExpiresAt && new Date(m.planExpiresAt) > new Date();
+        return [
+          m.memberCode,
+          m.name,
+          m.email,
+          m.currentPlan?.name || 'None',
+          m.planExpiresAt ? new Date(m.planExpiresAt).toLocaleDateString() : 'N/A',
+          isActive ? 'ACTIVE' : 'EXPIRED',
+        ];
+      }),
+      styles: { fontSize: 9 },
+      headStyles: { fillColor: [37, 99, 235] },
+    });
+    doc.save('membership_report.pdf');
+  }
+};
 
   return (
     <AdminLayout moduleName="Reports">
@@ -180,14 +184,17 @@ export const ReportsPage = () => {
         </button>
       </div>
 
-      <div className="bg-gray-900 rounded-xl p-1 flex items-center justify-between mb-6">
+      {/* Tabs + Export */}
+      <div className="bg-gray-900 rounded-xl p-1 flex items-center justify-between mb-6"></div>
         <div className="flex">
           {tabs.map((tab, i) => (
             <button
               key={tab}
               onClick={() => setActiveTab(i)}
               className={`px-4 py-2 rounded-lg text-xs font-bold tracking-wide transition-colors ${
-                activeTab === i ? 'bg-white text-gray-900' : 'text-gray-400 hover:text-white'
+                activeTab === i
+                  ? 'bg-white text-gray-900'
+                  : 'text-gray-400 hover:text-white'
               }`}
             >
               {tab}
@@ -195,20 +202,19 @@ export const ReportsPage = () => {
           ))}
         </div>
         <div className="flex gap-2 pr-2">
-          <button
-            onClick={exportCSV}
-            className="flex items-center gap-1.5 bg-gray-700 text-white px-3 py-1.5 rounded-lg text-xs font-semibold hover:bg-gray-600"
-          >
-            Export to CSV
-          </button>
-          <button
-            onClick={exportPDF}
-            className="flex items-center gap-1.5 bg-red-600 text-white px-3 py-1.5 rounded-lg text-xs font-semibold hover:bg-red-700"
-          >
-            Download Report (PDF)
-          </button>
-        </div>
-      </div>
+  <button
+    onClick={exportCSV}
+    className="flex items-center gap-1.5 bg-gray-700 text-white px-3 py-1.5 rounded-lg text-xs font-semibold hover:bg-gray-600"
+  >
+    ↓ Export to CSV
+  </button>
+  <button
+    onClick={exportPDF}
+    className="flex items-center gap-1.5 bg-red-600 text-white px-3 py-1.5 rounded-lg text-xs font-semibold hover:bg-red-700"
+  >
+    ↓ Download Report (PDF)
+  </button>
+</div>
 
       {loading ? (
         <div className="flex items-center justify-center h-64">
@@ -216,12 +222,16 @@ export const ReportsPage = () => {
         </div>
       ) : (
         <>
+          {/* ATTENDANCE SHEETS */}
           {activeTab === 0 && (
             <div className="space-y-4">
               <div className="grid grid-cols-3 gap-4">
+                {/* KPIs */}
                 <div className="col-span-2 bg-gray-900 rounded-xl p-5">
                   <p className="font-semibold text-white mb-1">Peak Workout Hours Index</p>
-                  <p className="text-xs text-gray-400 mb-4">Statistical hourly distribution of check-in times</p>
+                  <p className="text-xs text-gray-400 mb-4">
+                    Statistical hourly distribution of check-in times (Facility Density Index)
+                  </p>
                   <ResponsiveContainer width="100%" height={200}>
                     <AreaChart data={data.attendance.peakHours}>
                       <defs>
@@ -237,6 +247,7 @@ export const ReportsPage = () => {
                     </AreaChart>
                   </ResponsiveContainer>
                 </div>
+
                 <div className="bg-gray-900 rounded-xl p-5 space-y-3">
                   <p className="text-xs font-bold uppercase tracking-widest text-gray-400">Biometric Check KPIs</p>
                   <div className="bg-gray-800 rounded-lg p-3">
@@ -253,8 +264,12 @@ export const ReportsPage = () => {
                   </div>
                 </div>
               </div>
+
+              {/* Access Times Checklist */}
               <div className="bg-gray-900 rounded-xl p-5">
-                <p className="font-semibold text-white mb-4">Access Times Checklist ({data.attendance.recentSessions.length})</p>
+                <p className="font-semibold text-white mb-4">
+                  Access Times Checklist ({data.attendance.recentSessions.length})
+                </p>
                 <div className="grid grid-cols-4 pb-2 border-b border-gray-700 mb-2">
                   {['Athlete', 'Check-In', 'Check-Out', 'Duration'].map((h) => (
                     <p key={h} className="text-xs font-semibold text-gray-500 uppercase">{h}</p>
@@ -268,8 +283,10 @@ export const ReportsPage = () => {
                       <div key={s._id} className="grid grid-cols-4 py-2 border-b border-gray-800 text-sm">
                         <p className="text-white">{s.member?.name} ({s.memberCode})</p>
                         <p className="text-gray-300">{new Date(s.checkInTime).toLocaleString()}</p>
-                        <p className="text-gray-300">{s.checkOutTime ? new Date(s.checkOutTime).toLocaleString() : '-'}</p>
-                        <p className="text-gray-300">{s.duration ? `${s.duration} mins` : '-'}</p>
+                        <p className="text-gray-300">
+                          {s.checkOutTime ? new Date(s.checkOutTime).toLocaleString() : '—'}
+                        </p>
+                        <p className="text-gray-300">{s.duration ? `${s.duration} mins` : '—'}</p>
                       </div>
                     ))
                   )}
@@ -278,6 +295,7 @@ export const ReportsPage = () => {
             </div>
           )}
 
+          {/* REVENUE AUDITS */}
           {activeTab === 1 && (
             <div className="space-y-4">
               <div className="grid grid-cols-3 gap-4">
@@ -289,16 +307,17 @@ export const ReportsPage = () => {
                       <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
                       <XAxis dataKey="month" tick={{ fontSize: 11, fill: '#9ca3af' }} axisLine={false} tickLine={false} />
                       <YAxis tick={{ fontSize: 11, fill: '#9ca3af' }} axisLine={false} tickLine={false} />
-                      <Tooltip contentStyle={{ background: '#1f2937', border: 'none', color: '#fff', fontSize: 12 }} formatter={(v) => `P${v}`} />
+                      <Tooltip contentStyle={{ background: '#1f2937', border: 'none', color: '#fff', fontSize: 12 }} formatter={(v) => `₱${v}`} />
                       <Bar dataKey="total" fill="#f59e0b" radius={[4, 4, 0, 0]} />
                     </BarChart>
                   </ResponsiveContainer>
                 </div>
+
                 <div className="bg-gray-900 rounded-xl p-5 space-y-3">
                   <p className="text-xs font-bold uppercase tracking-widest text-gray-400">Ledger Metrics</p>
                   <div className="bg-gray-800 rounded-lg p-3">
                     <p className="text-xs text-gray-400 uppercase">Gross Cashflow:</p>
-                    <p className="text-2xl font-bold text-yellow-400 mt-1">P{data.revenue.totalRevenue.toLocaleString()}</p>
+                    <p className="text-2xl font-bold text-yellow-400 mt-1">₱{data.revenue.totalRevenue.toLocaleString()}</p>
                   </div>
                   <div className="bg-gray-800 rounded-lg p-3">
                     <p className="text-xs text-gray-400 uppercase">Sales Transaction Volume:</p>
@@ -306,12 +325,16 @@ export const ReportsPage = () => {
                   </div>
                   <div className="bg-gray-800 rounded-lg p-3">
                     <p className="text-xs text-gray-400 uppercase">Average Invoice Value:</p>
-                    <p className="text-2xl font-bold text-green-400 mt-1">P{data.revenue.avgInvoice}</p>
+                    <p className="text-2xl font-bold text-green-400 mt-1">₱{data.revenue.avgInvoice}</p>
                   </div>
                 </div>
               </div>
+
+              {/* Payments Checklist */}
               <div className="bg-gray-900 rounded-xl p-5">
-                <p className="font-semibold text-white mb-4">Payments Checklist Ledger ({data.revenue.totalInvoices})</p>
+                <p className="font-semibold text-white mb-4">
+                  Payments Checklist Ledger ({data.revenue.totalInvoices})
+                </p>
                 <div className="grid grid-cols-5 pb-2 border-b border-gray-700 mb-2">
                   {['Invoice Ref', 'Athlete', 'Contract Plan', 'Receipt Way', 'Gross Value'].map((h) => (
                     <p key={h} className="text-xs font-semibold text-gray-500 uppercase">{h}</p>
@@ -326,7 +349,7 @@ export const ReportsPage = () => {
                       <span className="inline-block border border-gray-600 rounded px-2 py-0.5 text-xs text-gray-300 uppercase w-fit">
                         {p.paymentMethod}
                       </span>
-                      <p className="text-green-400 font-semibold">P{p.planPrice}</p>
+                      <p className="text-green-400 font-semibold">₱{p.planPrice}</p>
                     </div>
                   ))}
                 </div>
@@ -334,11 +357,12 @@ export const ReportsPage = () => {
             </div>
           )}
 
+          {/* MEMBERSHIP REGISTERS */}
           {activeTab === 2 && (
             <div className="space-y-4">
               <div className="grid grid-cols-3 gap-4">
                 <div className="col-span-2 bg-gray-900 rounded-xl p-5">
-                  <p className="font-semibold text-white mb-2">Biological Genders Mix</p>
+                  <p className="font-semibold text-white mb-4">Biological Genders Mix</p>
                   <p className="text-xs text-gray-400 mb-4">Statistical division of physical profiles in registry</p>
                   <div className="grid grid-cols-3 gap-3">
                     {[
@@ -354,6 +378,7 @@ export const ReportsPage = () => {
                     ))}
                   </div>
                 </div>
+
                 <div className="bg-gray-900 rounded-xl p-5 space-y-3">
                   <p className="text-xs font-bold uppercase tracking-widest text-gray-400">Contract Counters</p>
                   <div className="bg-gray-800 rounded-lg p-3">
@@ -366,8 +391,12 @@ export const ReportsPage = () => {
                   </div>
                 </div>
               </div>
+
+              {/* Members Checklist */}
               <div className="bg-gray-900 rounded-xl p-5">
-                <p className="font-semibold text-white mb-4">Members Profiles Checklist ({data.membership.totalMembers})</p>
+                <p className="font-semibold text-white mb-4">
+                  Members Profiles Checklist ({data.membership.totalMembers})
+                </p>
                 <div className="grid grid-cols-5 pb-2 border-b border-gray-700 mb-2">
                   {['Code / Name', 'Email Link', 'Plan Active', 'Expiration Date', 'Subscription Status'].map((h) => (
                     <p key={h} className="text-xs font-semibold text-gray-500 uppercase">{h}</p>
@@ -381,7 +410,9 @@ export const ReportsPage = () => {
                         <p className="text-white font-mono">{m.memberCode} - {m.name}</p>
                         <p className="text-gray-400 text-xs">{m.email}</p>
                         <p className="text-gray-300">{m.currentPlan?.name || 'None'}</p>
-                        <p className="text-gray-300">{m.planExpiresAt ? new Date(m.planExpiresAt).toLocaleDateString() : 'N/A'}</p>
+                        <p className="text-gray-300">
+                          {m.planExpiresAt ? new Date(m.planExpiresAt).toLocaleDateString() : 'N/A'}
+                        </p>
                         <span className={`inline-block px-2 py-0.5 rounded text-xs font-bold w-fit ${
                           isActive ? 'bg-green-900 text-green-400' : 'bg-red-900 text-red-400'
                         }`}>
